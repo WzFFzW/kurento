@@ -31,7 +31,7 @@ window.onload = function () {
 	console.log('Page loaded ...');
 	videoInput = document.getElementById('videoInput');
 	videoOutput = document.getElementById('videoOutput');
-	rommID = this.document.getElementById('roomId').value;
+	rommID = this.document.getElementById('roomId');
 	setState(I_CAN_START);
 }
 
@@ -73,9 +73,10 @@ ws.onmessage = function (message) {
 }
 
 function start() {
-	if (!rommID) {
+	if (!rommID.value) {
 		return alert('请输入房间id');
 	}
+	rommID = rommID.value;
 	console.log('Starting video call ...')
 
 	// Disable start button
@@ -107,7 +108,6 @@ function onIceCandidate(candidate) {
 	var message = {
 		id: 'onIceCandidate',
 		candidate: candidate,
-		roomId: roomId,
 	};
 	sendMessage(message);
 }
@@ -118,7 +118,8 @@ function onOffer(error, offerSdp) {
 	console.info('Invoking SDP offer callback function ' + location.host);
 	var message = {
 		id: 'start',
-		sdpOffer: offerSdp
+		sdpOffer: offerSdp,
+		roomId: roomId,
 	}
 	sendMessage(message);
 }

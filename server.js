@@ -127,7 +127,7 @@ wss.on('connection', function (ws) {
         switch (message.id) {
             case 'start':
                 sessionId = request.session.id;
-                start(sessionId, ws, message.sdpOffer, roomID, function (error, sdpAnswer) {
+                start(sessionId, ws, message.sdpOffer, message.roomId, function (error, sdpAnswer) {
                     if (error) {
                         return ws.send(JSON.stringify({
                             id: 'error',
