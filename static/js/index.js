@@ -18,6 +18,7 @@
 var ws = new WebSocket('wss://' + location.host + '/magicmirror');
 var videoInput;
 var videoOutput;
+var rommID;
 var webRtcPeer;
 var state = null;
 
@@ -30,6 +31,7 @@ window.onload = function () {
 	console.log('Page loaded ...');
 	videoInput = document.getElementById('videoInput');
 	videoOutput = document.getElementById('videoOutput');
+	rommID = this.document.getElementById('roomId').value;
 	setState(I_CAN_START);
 }
 
@@ -60,6 +62,7 @@ ws.onmessage = function (message) {
 		case "rtmp":
 			console.log('Recv rtmp request:', parsedMessage.message);
 			playrtmp('rtmp://' + location.hostname + parsedMessage.message);
+			document.getElementById('room').innerText = `https://${location.hostname}/${parsedMessage.message}`;
 			break;
 		default:
 			if (state == I_AM_STARTING) {
@@ -70,12 +73,14 @@ ws.onmessage = function (message) {
 }
 
 function start() {
+	if (!rommID) {
+		return alert('请输入房间id');
+	}
 	console.log('Starting video call ...')
 
 	// Disable start button
 	setState(I_AM_STARTING);
 	showSpinner(videoInput, videoOutput);
-
 	console.log('Creating WebRtcPeer and generating local sdp offer ...');
 
 	var options = {
@@ -96,40 +101,13 @@ function start() {
 		this.generateOffer(onOffer);
 	});
 }
-function playrtmp(rtmpaddress) {
-	var parameters = {
-		src: rtmpaddress,
-		autoPlay: "true",
-		controlBarAutoHide: "true",
-		poster: "img/adobe.jpg",
-		javascriptCallbackFunction: "jsbridge"
-	};
-	console.log(parameters);
-	// Embed the player SWF:
-	swfobject.embedSWF(
-		"GrindPlayer.swf"
-		, "VideoElement"
-		, 480
-		, 360
-		, "10.2"
-		, "expressInstall.swf"
-		, parameters
-		,
-		{
-			allowFullScreen: "true",
-			wmode: "transparent"
-		}
-		, {
-			name: "GrindPlayer"
-		}
-	);
-}
 function onIceCandidate(candidate) {
 	console.log('Local candidate' + JSON.stringify(candidate));
 
 	var message = {
 		id: 'onIceCandidate',
-		candidate: candidate
+		candidate: candidate,
+		roomId: roomId,
 	};
 	sendMessage(message);
 }

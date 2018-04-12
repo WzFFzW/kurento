@@ -24,54 +24,25 @@
 
   <script src="/js/swfobject.min.js"></script>
   <script src="js/index.js"></script>
-  <title>Kurento-rtp-node</title>
+  <title>webrtc-WzFFzW</title>
 </head>
 
 <body>
-
-  <header>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"></button>
-          <a class="navbar-brand" href=".">Kurento Tutorial</a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li>
-              <a href="https://github.com/godka/kurento-rtmp">
-                <span class="glyphicon glyphicon-file"></span> Source Code</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </header>
-
   <div class="container">
-    <div class="page-header">
-      <h1>Kurento-RTMP</h1>
-    </div>
     <div class="row">
       <div class="col-md-6">
         <h3>Local Stream</h3>
         <video id="videoInput" autoplay width="480px" height="360px" poster="img/webrtc.png"></video>
       </div>
-      <div class="col-md-6" id="videocontainer">
-        <h3>RTMP Stream</h3>
-        <div id="VideoElement">
-            <script>
-              playrtmp()
-            </script>
-        </div>
-      </div>
       <div class="col-md-10">
-        <a id="start" href="#" class="btn btn-success">
+        <a id="start" href="javascript:void(0);" class="btn btn-success">
           <span class="glyphicon glyphicon-play"></span> Start</a>
-        <a id="stop" href="#" class="btn btn-danger">
+        <a id="stop" href="javascript:void(0);" class="btn btn-danger">
           <span class="glyphicon glyphicon-stop"></span> Stop</a>
+          <input id="roomId" type="text" class="form-control" placeholder="房间号" aria-describedby="basic-addon1">
       </div>
     </div>
+    <div id="romm"></div>
     <div class="row">
       <div class="col-md-12">
         <label class="control-label" for="console">Console</label><br><br>
@@ -81,22 +52,6 @@
       </div>
     </div>
   </div>
-
-  <footer>
-    <div class="foot-fixed-bottom">
-      <div class="container text-center">
-        <hr/>
-        <div class="row">
-          <div class="col-md-12">
-            <a href="http://www.kurento.org">
-              <img src="img/kurento.png" alt="Kurento" height="50px" />
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
-
 </body>
 
 </html>

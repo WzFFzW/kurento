@@ -127,7 +127,7 @@ wss.on('connection', function (ws) {
         switch (message.id) {
             case 'start':
                 sessionId = request.session.id;
-                start(sessionId, ws, message.sdpOffer, function (error, sdpAnswer) {
+                start(sessionId, ws, message.sdpOffer, roomID, function (error, sdpAnswer) {
                     if (error) {
                         return ws.send(JSON.stringify({
                             id: 'error',
@@ -182,7 +182,7 @@ function getKurentoClient(callback) {
     });
 }
 
-function start(sessionId, ws, sdpOffer, callback) {
+function start(sessionId, ws, sdpOffer, roomID, callback) {
     if (!sessionId) {
         return callback('Cannot use undefined sessionId');
     }
@@ -244,7 +244,7 @@ function start(sessionId, ws, sdpOffer, callback) {
                                 }
                                 console.log('start process on: rtp://' + streamIp + ':' + streamPort);
                                 console.log('recv sdp answer:', sdpAnswer);
-                                var _ffmpeg_child = bindFFmpeg(streamIp, streamPort, sdpRtpOfferString, ws);
+                                var _ffmpeg_child = bindFFmpeg(streamIp, streamPort, sdpRtpOfferString, ws, roomID);
                                 sessions[sessionId] = {
                                     'pipeline': pipeline,
                                     'webRtcEndpoint': webRtcEndpoint,
@@ -346,20 +346,19 @@ m=video 55000 RTP/AVP 96
 b=AS:200
 a=rtpmap:96 H264/90000
 */
-function bindFFmpeg(streamip, streamport, sdpData, ws) {
+function bindFFmpeg(streamip, streamport, sdpData, ws, roomID) {
     fs.writeFileSync(streamip + '_' + streamport + '.sdp', sdpData);
     var ffmpeg_args = [
-        '-protocol_whitelist', 'file,udp,rtp',
         '-i', path.join(__dirname, streamip + '_' + streamport + '.sdp'),
         '-vcodec', 'copy',
         '-acodec', 'copy',
         '-f', 'flv',
-        'rtmp://localhost/live/' + streamip + '_' + streamport
+        'rtmp://localhost:1935/live/' + roomID,
     ].concat();
     var child = spawn('ffmpeg', ffmpeg_args);
     ws.send(JSON.stringify({
         id: 'rtmp',
-        message: '/live/' + streamip + '_' + streamport
+        message: roomID,
     }));
     //ignore stdout
     //this.child.stdout.on('data', this.emit.bind(this, 'data'));
@@ -434,8 +433,16 @@ function onIceCandidate(sessionId, _candidate) {
         candidatesQueue[sessionId].push(candidate);
     }
 }
-
+app.set('views', path.join(__dirname, 'static'));
+app.engine('html',require('ejs').renderFile);
+app.set('view engine', 'html');
 app.use(express.static(path.join(__dirname, 'static')));
+app.get('/live', function(req, res) {
+    res.render('sender');
+});
+app.get('/:roomId', function(req, res) {
+    res.render('viewer');
+});
 var nms = new NodeMediaServer(rtmp_server_config);
 nms.run();
 process.on('uncaughtException', function (error) {
