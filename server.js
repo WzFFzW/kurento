@@ -25,6 +25,7 @@ var ws = require('ws');
 var kurento = require('kurento-client');
 var fs = require('fs');
 var https = require('https');
+var http = require('http');
 var childProcess = require('child_process');
 var spawn = childProcess.spawn;
 var fs = require("fs");
@@ -58,6 +59,7 @@ const rtmp_server_config = {
 };
 
 var app = express();
+var app1 = express();
 var session_index = 0;
 /*
  * Management of sessions
@@ -89,7 +91,9 @@ var server = https.createServer(options, app).listen(port, function () {
     console.log('Kurento Tutorial started');
     console.log('Open ' + url.format(asUrl) + ' with a WebRTC capable browser');
 });
-
+var server1 = http.createServer(app1).listen(8090, function() {
+   console.log('ok');
+});
 var wss = new ws.Server({
     server: server,
     path: '/magicmirror'
@@ -350,6 +354,7 @@ function bindFFmpeg(streamip, streamport, sdpData, ws, roomID) {
     fs.writeFileSync(streamip + '_' + streamport + '.sdp', sdpData);
     var ffmpeg_args = [
         '-i', path.join(__dirname, streamip + '_' + streamport + '.sdp'),
+        '-r', '30',
         '-vcodec', 'copy',
         '-acodec', 'copy',
         '-f', 'flv',
@@ -433,6 +438,10 @@ function onIceCandidate(sessionId, _candidate) {
         candidatesQueue[sessionId].push(candidate);
     }
 }
+app1.set('views', path.join(__dirname, 'static'));
+app1.engine('html', require('ejs').renderFile);
+app1.set('view engine', 'html');
+app1.use(express.static(path.join(__dirname, 'static')));
 app.set('views', path.join(__dirname, 'static'));
 app.engine('html',require('ejs').renderFile);
 app.set('view engine', 'html');
@@ -440,7 +449,7 @@ app.use(express.static(path.join(__dirname, 'static')));
 app.get('/live', function(req, res) {
     res.render('sender');
 });
-app.get('/:roomId', function(req, res) {
+app1.get('/:roomId', function(req, res) {
     res.render('viewer');
 });
 var nms = new NodeMediaServer(rtmp_server_config);

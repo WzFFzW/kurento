@@ -92,7 +92,7 @@ function start() {
       audio: true,
       video: {
         width: 620,
-        framerate: 15
+        framerate: 60
       }
     }
 	}
@@ -119,7 +119,7 @@ function onOffer(error, offerSdp) {
 	var message = {
 		id: 'start',
 		sdpOffer: offerSdp,
-		roomId: roomId,
+		roomId: rommID,
 	}
 	sendMessage(message);
 }

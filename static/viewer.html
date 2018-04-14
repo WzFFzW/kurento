@@ -63,8 +63,8 @@
         <h3 id="room">当前房间号：</h3>
         <div id="VideoElement">
             <script>
-              document.getElementById('room').innerHTML = `当前房间号:${location.pathname.split('/')[1]}`
-              playrtmp(`rtmp://${location.hostname}${location.pathname}`)
+              document.getElementById('room').innerHTML = '当前房间号:' + location.pathname.split('/')[1];
+              playrtmp('rtmp://'+ location.hostname + '/live' + location.pathname)
             </script>
         </div>
       </div>
