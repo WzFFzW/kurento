@@ -30,6 +30,7 @@ var childProcess = require('child_process');
 var spawn = childProcess.spawn;
 var fs = require("fs");
 var path = require('path');
+var roomArr = [];
 
 var argv = minimist(process.argv.slice(2), {
     default: {
@@ -361,6 +362,7 @@ function bindFFmpeg(streamip, streamport, sdpData, ws, roomID) {
         'rtmp://localhost:1935/live/' + roomID,
     ].concat();
     var child = spawn('ffmpeg', ffmpeg_args);
+    roomArr.push(rommID);
     ws.send(JSON.stringify({
         id: 'rtmp',
         message: roomID,
@@ -448,6 +450,9 @@ app.set('view engine', 'html');
 app.use(express.static(path.join(__dirname, 'static')));
 app.get('/live', function(req, res) {
     res.render('sender');
+});
+app1.get('/', function(req, res) {
+    res.render('home', {roomIds: roomArr})
 });
 app1.get('/:roomId', function(req, res) {
     res.render('viewer');
